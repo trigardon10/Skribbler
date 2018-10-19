@@ -1,0 +1,110 @@
+<html>
+
+<head>
+    <title>Skribbler</title>
+
+    <!-- DEPENDENCIES -->
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="content/scripts/Skribbler.js"></script>
+    <script type="text/javascript" src="content/scripts/Chat.js"></script>
+    <script type="text/javascript" src="content/scripts/Gamemanager.js"></script>
+
+    <style>
+        
+        canvas {
+            border: 1px solid black;
+
+        }
+        
+        .flex-container {
+            display: flex;
+
+        }
+        .flex-container > div {
+            margin: 0 5px;
+        }
+
+        .chat {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #chatBox > div{
+            margin: 5px;
+            border-bottom: 1px solid #808080;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div>
+        <h2>
+            Skribbler
+        </h2>
+    </div>
+
+    <div id="gameArea">
+
+        <div>
+            <p>TIME: XX</p>
+        </div>
+        <div>
+            <p>pl_ceh_lder wo_d</p>
+        </div>
+
+        <div class="flex-container">
+            <div id="playerlist" style="height: 600px; width: 200px; border: 1px solid black;">
+
+            </div>
+            <div>
+                <canvas id="canvas" height="600" width="800"></canvas>
+            </div>
+            <div class="chat">
+                <div id="chatBox" style="border: 1px black solid; height: 550px; width: 400px;">
+                    <div>
+                        PLACEHOLDERNAME:<br>
+                        MESSAGE sjdfhksjdhfksjhfekjhskdjfhs sdfjsldkfj asdf asdf asdfasfawef waefasdf asefawefaw
+                        fawefawdf asef
+
+                    </div>
+                    <div>
+                        PLACEHOLDERNAME:<br>
+                        MESSAGE sjdfhksjdhfksjhfekjhskdjfhs sdfjsldkfj asdf asdf asdfasfawef waefasdf asefawefaw
+                        fawefawdf asef
+                    </div>
+                    <div>
+                        PLACEHOLDERNAME:<br>
+                        MESSAGE sjdfhksjdhfksjhfekjhskdjfhs sdfjsldkfj asdf asdf asdfasfawef waefasdf asefawefaw
+                        fawefawdf asef
+                    </div>
+                    <div>
+                        PLACEHOLDERNAME:<br>
+                        MESSAGE sjdfhksjdhfksjhfekjhskdjfhs sdfjsldkfj asdf asdf asdfasfawef waefasdf asefawefaw
+                        fawefawdf asef
+                    </div>
+
+                </div>
+                <div id="chatWrite">
+                    <textarea style="height: 50px; width: 350px"></textarea>
+                    <input type="button" value="➥" style="height: 50px; width: 50px;" />
+                </div>
+            </div>
+
+        </div>
+        <div>
+
+            <input type="color" id="colorpicker" />
+            <input type="button" id="clear" value="Clear" />
+            <input type="button" id="send" value="Send" />
+            <input type="button" id="get" value="Get" />
+
+        </div>
+    </div>
+
+</body>
+
+</html>
