@@ -8,7 +8,7 @@ import javax.ws.rs.core.*;
 @Path("/endpoint")
 public class Endpoint {
 	
-	static String image = "{}";
+	static String image = "[]";
 	ArrayList<String> messages;
 	
 	@PUT
