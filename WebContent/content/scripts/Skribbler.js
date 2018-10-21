@@ -7,13 +7,16 @@ if (window.addEventListener('load', function () {
     var canvas, c, tool;
     var btn_clear, btn_color;
     var strokeStyle = "#000000";
+    var imgPoints=[];
+    var timeoutSend;
+    var timeoutGet;
+    var get = false;
 
     function init() {
         canvas = document.getElementById("canvas");
         c = canvas.getContext("2d");
 
         btn_clear = document.getElementById("clear");
-        btn_send = document.getElementById("send");
         btn_get = document.getElementById("get");
         btn_color = document.getElementById("colorpicker");
 
@@ -25,8 +28,7 @@ if (window.addEventListener('load', function () {
 
 
         btn_clear.addEventListener("click", clear, false);
-        btn_send.addEventListener("click", send, false)
-        btn_get.addEventListener("click", get, false)
+        btn_get.addEventListener("click", toggleGet, false);
         btn_color.addEventListener("change", color, false);
     }
 
@@ -35,14 +37,18 @@ if (window.addEventListener('load', function () {
         this.started = false;
 
         this.mousedown = function (ev) {
-            c.beginPath();
-            c.moveTo(ev._x, ev._y);
-            tool.started = true;
+//        	if(!get){
+        		c.beginPath();
+                c.moveTo(ev._x, ev._y);
+                imgPoints.push([{x:ev._x, y:ev._y}]);
+                tool.started = true;
+//        	}
         };
 
         this.mousemove = function (ev) {
             if (tool.started) {
                 c.lineTo(ev._x, ev._y);
+                imgPoints[imgPoints.length-1].push({x:ev._x, y:ev._y});
                 c.strokeStyle = strokeStyle;
                 c.stroke();
             }
@@ -77,45 +83,79 @@ if (window.addEventListener('load', function () {
     function clear() {
     	
         c.clearRect(0, 0, canvas.width, canvas.height);
+        imgPoints = [];
         
-    }
-
-    function send() {
-    	var image = Array.from(c.getImageData(0, 0, 800, 600).data);
-    	var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function() { 
-        	console.log(xmlHttp.status);
-            if (xmlHttp.readyState == 4 && (xmlHttp.status >= 200 && xmlHttp.status <= 299)){
-            	console.log(xmlHttp.status);
-            	console.log(xmlHttp.responseText);
-            }
-        }
-        console.log(JSON.stringify(image))
-        xmlHttp.open("PUT", "/Sribblio2/rest/endpoint/img", true); // true for asynchronous 
-        xmlHttp.send(JSON.stringify(image));
-    }
-    
-    function get() {
-    	var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function() { 
-            if (xmlHttp.readyState == 4 && (xmlHttp.status >= 200 && xmlHttp.status <= 299)){
-            	console.log(xmlHttp.status);
-            	console.log(xmlHttp.responseText);
-            	var image = {};
-            	image = new ImageData(Uint8ClampedArray.from(JSON.parse(xmlHttp.responseText)), 800, 600);
-            	c.putImageData(image, 0, 0);
-            }
-        }
-        xmlHttp.open("GET", "/Sribblio2/rest/endpoint/img", true); // true for asynchronous 
-        xmlHttp.send();
     }
 
     function color(ev) {
         console.log(this.value);
         strokeStyle = this.value;
     }
+    
+    function draw(points){
+    	c.clearRect(0, 0, canvas.width, canvas.height);
+    	imgPoints = points;
+    	if(points.length > 0){
+    		for(var i = 0; i < points.length; i++){
+    			if(points[i].length > 0){
+    				c.beginPath();
+                    c.moveTo(points[i][0].x, points[i][0].y);
+                	for(var j = 1; j < points[i].length; j++){
+                		c.lineTo(points[i][j].x, points[i][j].y);
+                        c.strokeStyle = strokeStyle;
+                        c.stroke();
+                	}
+    			}
+    		}
+    	}
+    }
+    
+    function toggleGet(){
+    	get = !get;
+    }
+    
+    function sendImage() {
+    	var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+            if (xmlHttp.readyState == 4 && (xmlHttp.status >= 200 && xmlHttp.status <= 299)){
+            	timeoutSend = setTimeout(function(){
+            		if(get){
+            			getImage();
+            		}
+            		else{
+            			sendImage();
+            		}
+            	},50)
+            }
+        }
+        xmlHttp.open("PUT", "/Sribblio2/rest/endpoint/img", true); // true for asynchronous 
+        xmlHttp.send(JSON.stringify(imgPoints));
+    }
 
+    function getImage() {
+    	var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && (xmlHttp.status >= 200 && xmlHttp.status <= 299)){
+            	draw(JSON.parse(xmlHttp.responseText));
+            	timeoutGet = setTimeout(function(){
+            		if(get){
+            			getImage();
+            		}
+            		else{
+            			sendImage();
+            		}
+            	},50)
+            }
+        }
+        xmlHttp.open("GET", "/Sribblio2/rest/endpoint/img", true); // true for asynchronous 
+        xmlHttp.send();
+    }
+    
     init();
+    timeoutSend = setTimeout(function(){
+    	sendImage();
+//        getImage();
+    })
 
 }, false));
 
